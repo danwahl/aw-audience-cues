@@ -1,0 +1,45 @@
+# Builds the eating-animals pilot page (dtcues/animals_page.py) from the packed data and publishes it to GitHub Pages.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["dtcues/**", "pyproject.toml", "uv.lock", "data/judge_notags.jsonl.gz", "data/raw_*_notags_aw.jsonl.gz", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+      - name: Unpack the files the page reads
+        run: |
+          mkdir -p results
+          for f in data/judge_notags.jsonl.gz data/raw_*_notags_aw.jsonl.gz; do
+            gunzip -c "$f" > "results/$(basename "$f" .gz)"
+          done
+      - run: uv run python -m dtcues.animals_page
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: post/animals
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

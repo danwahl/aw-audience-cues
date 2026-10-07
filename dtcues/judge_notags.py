@@ -8,10 +8,12 @@ import asyncio
 import glob
 import hashlib
 import json
+import os
 from collections import Counter, defaultdict
 from pathlib import Path
 
 import anthropic
+import openai
 from dotenv import load_dotenv
 
 from . import prompts as P
@@ -91,12 +93,27 @@ async def judge(model="claude-sonnet-5", concurrency=32):
                 todo[h] = (sysm, text)
     print(f"{len(todo)} answers to classify ({len(cache)} cached)")
     if todo:
-        client = anthropic.AsyncAnthropic(max_retries=6); sem = asyncio.Semaphore(concurrency); fh = CACHE.open("a")
+        # Without an Anthropic key, the same judge model is reached through OpenRouter.
+        via_or = not os.environ.get("ANTHROPIC_API_KEY") and os.environ.get("OPENROUTER_API_KEY")
+        if via_or:
+            client = openai.AsyncOpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.environ["OPENROUTER_API_KEY"], max_retries=6)
+        else:
+            client = anthropic.AsyncAnthropic(max_retries=6)
+        sem = asyncio.Semaphore(concurrency); fh = CACHE.open("a")
         async def one(h, sysm, text):
+            user = f"<answer>\n{text}\n</answer>"
             async with sem:
-                resp = await client.messages.create(model=model, max_tokens=1500, system=sysm, thinking={"type": "adaptive"}, output_config={"effort": "low"},
-                                                    messages=[{"role": "user", "content": f"<answer>\n{text}\n</answer>"}])
-            label = "".join(b.text for b in resp.content if b.type == "text").strip().split("\n")[0].strip().strip(".").strip()
+                if via_or:
+                    resp = await client.chat.completions.create(model=f"anthropic/{model}", max_tokens=1500, extra_body={"reasoning": {"effort": "low"}},
+                                                                messages=[{"role": "system", "content": sysm}, {"role": "user", "content": user}])
+                    out = (resp.choices[0].message.content or "") if resp.choices else ""
+                else:
+                    resp = await client.messages.create(model=model, max_tokens=1500, system=sysm, thinking={"type": "adaptive"}, output_config={"effort": "low"},
+                                                        messages=[{"role": "user", "content": user}])
+                    out = "".join(b.text for b in resp.content if b.type == "text")
+            label = out.strip().split("\n")[0].strip().strip(".").strip()
+            if not label:   # left out of the cache so the next run retries it
+                return
             fh.write(json.dumps({"hash": h, "label": label}) + "\n"); fh.flush()
         await asyncio.gather(*(one(h, s, t) for h, (s, t) in todo.items()))
         fh.close()
@@ -150,7 +167,7 @@ def compare(rows, cache):
     def fmt(c):
         n = sum(c.values()); return f"n={n}: " + ", ".join(f"{k} {v}" for k, v in c.most_common())
     lines = []
-    for (m, e, pid) in sorted(keys):
+    for (m, e, pid) in sorted(keys, key=lambda k: (k[0], str(k[1]), k[2])):
         spec = SPECS[pid]
         a = summarize([r for r in tagged if r["model"] == m and r.get("effort") == e and r["prompt_id"] == pid], spec, True)
         b = summarize([r for r in rows if r["model"] == m and r.get("effort") == e and r["prompt_id"] == pid], spec, False)

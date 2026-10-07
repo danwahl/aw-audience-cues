@@ -36,6 +36,8 @@ class Completion:
 
 
 def provider_for(model: str) -> str:
+    if "/" in model:
+        return "openrouter"   # OpenRouter ids are vendor/model, e.g. deepseek/deepseek-v4.1-flash
     return "anthropic" if model.startswith("claude") else "openai"
 
 
@@ -122,6 +124,43 @@ class OpenAI:
             text=resp.output_text or "", thinking="\n".join(t for t in thinking if t),
             stop_reason=stop, usage=resp.usage.model_dump(exclude_none=True) if resp.usage else {},
             request_id=getattr(resp, "_request_id", None), response_id=resp.id,
+        )
+
+
+class OpenRouter:
+    """OpenRouter's OpenAI-compatible chat completions. Multi-turn takes the full messages list, as with Anthropic."""
+
+    def __init__(self):
+        if not os.environ.get("OPENROUTER_API_KEY"):
+            raise RuntimeError("OPENROUTER_API_KEY is empty - add it to .env")
+        self.client = openai.AsyncOpenAI(base_url="https://openrouter.ai/api/v1", api_key=os.environ["OPENROUTER_API_KEY"],
+                                         max_retries=6, timeout=600)
+
+    async def complete(self, model: str, user_text: str | list, *, system: str | None = None,
+                       effort: str | None = None, max_tokens: int = 16000) -> Completion:
+        """effort=None leaves reasoning at the model's default, as the GPT-6 Astra runs did."""
+        messages = user_text if isinstance(user_text, list) else [{"role": "user", "content": user_text}]
+        if system:
+            messages = [{"role": "system", "content": system}] + messages
+        extra: dict = {"usage": {"include": True}}
+        if effort:
+            extra["reasoning"] = {"effort": effort}
+        try:
+            resp = await self.client.chat.completions.create(model=model, messages=messages, max_tokens=max_tokens, extra_body=extra)
+        except openai.OpenAIError as e:
+            return Completion("openrouter", model, model, "", error=f"{type(e).__name__}: {str(e)[:300]}")
+        if not resp.choices:
+            return Completion("openrouter", model, model, "", error=f"no choices: {getattr(resp, 'error', None)}")
+        ch = resp.choices[0]
+        text = ch.message.content or ""
+        if ch.finish_reason == "error" or not text and ch.finish_reason != "length":
+            return Completion("openrouter", model, resp.model, text, error=f"finish_reason={ch.finish_reason}, {len(text)} chars")
+        stop = "max_tokens" if ch.finish_reason == "length" else ch.finish_reason
+        return Completion(
+            provider="openrouter", model=model, served_model=resp.model,
+            text=text, thinking=getattr(ch.message, "reasoning", None) or "",
+            stop_reason=stop, usage=resp.usage.model_dump(exclude_none=True) if resp.usage else {},
+            request_id=resp.id, content_blocks=[{"type": "text", "text": text}],
         )
 
 

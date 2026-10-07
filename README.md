@@ -6,6 +6,31 @@ Companion repository for the LessWrong post of that title (Alex Kastner, 2026):
 It holds everything behind the post's figures: the exact prompts, every raw sample from every model, the judge's
 classification of each answer, and the code that turns them into the figures and tables.
 
+## This fork: eating animals (set `AW`)
+
+This fork reruns the post's main cues with the decision-theory question replaced by the PhilPapers 2020 survey question on
+eating animals: "Is it permissible to eat animals and/or animal products in ordinary circumstances?", answered with
+omnivorism, vegetarianism or veganism. The pilot asks DeepSeek V4.1 Flash, GLM 5.3 Flash and GPT-6 Luna 20 times per cue
+through OpenRouter, and classifies the free-text answers with the post's rubric and Sonnet 5 judge. The results page is
+published at **https://danwahl.github.io/aw-audience-cues/**.
+
+| Path | Contents |
+|---|---|
+| `dtcues/prompts.py` | Set `AW`: the question, plus the post's personas, openers, interest openers and conversations, except two that would leak into the answer (the opener citing Nozick, and the conversation in which the user says they eat mostly vegetarian). |
+| `dtcues/providers.py` | `OpenRouter`, used for any model id containing a `/`. `judge_notags.py` reaches the judge through OpenRouter when `ANTHROPIC_API_KEY` is unset. |
+| `dtcues/animals_page.py` | Builds the results page from `animals_page_template.html`. `.github/workflows/pages.yml` runs it on every push to `main` that touches the code or the pilot data. |
+| `data/raw_*_notags_aw.jsonl.gz` | The pilot's samples. Their labels are in `data/judge_notags.jsonl.gz` with the rest. |
+
+```bash
+uv run python -m dtcues run --models deepseek/deepseek-v4.1-flash --sets AW --n 20 --notags --concurrency 16 \
+    --out results/raw_deepseek_deepseek-v4.1-flash_notags_aw.jsonl
+uv run python -m dtcues.judge_notags
+uv run python -m dtcues.animals_page   # -> post/animals/index.html
+```
+
+Some answers to the nurse and Anthropic-employee personas read the question as whether the asker's job allows eating
+animals, which inflates omnivorism on those rows.
+
 ## What is here
 
 | Path | Contents |

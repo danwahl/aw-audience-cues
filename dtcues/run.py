@@ -11,7 +11,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 from .prompts import PromptSpec, build_prompts, select
-from .providers import Anthropic, OpenAI, provider_for
+from .providers import Anthropic, OpenAI, OpenRouter, provider_for
 from .parse import parse_pick, parse_credences, parse_choice, parse_asker, parse_tag_stance, parse_yesno, parse_any_choice, stance as stance_of, strip_tag_instructions
 from .prompts import PROBLEMS, PHIL_QUESTIONS
 
@@ -82,7 +82,7 @@ async def run(models: list[str], n: int, out: Path, *, sets: list[str] | None = 
     done = load_done(out)
 
     def eff_api(m: str):
-        return effort if provider_for(m) == "anthropic" else openai_effort
+        return {"anthropic": effort, "openai": openai_effort}.get(provider_for(m))
 
     def eff_label(m: str):
         e = eff_api(m)
@@ -120,6 +120,8 @@ async def run(models: list[str], n: int, out: Path, *, sets: list[str] | None = 
         clients["anthropic"] = Anthropic()
     if any(provider_for(m) == "openai" for m in models):
         clients["openai"] = OpenAI()
+    if any(provider_for(m) == "openrouter" for m in models):
+        clients["openrouter"] = OpenRouter()
 
     sem = asyncio.Semaphore(concurrency)
     lock = asyncio.Lock()
@@ -148,7 +150,7 @@ async def run(models: list[str], n: int, out: Path, *, sets: list[str] | None = 
             prev_id = None
             c = None
             for u in s.prior_turns:
-                if prov == "anthropic":
+                if prov in ("anthropic", "openrouter"):
                     history.append({"role": "user", "content": u})
                     c = await clients[prov].complete(model, history, system=sys_prompt, effort=eff, max_tokens=max_tokens)
                     if c.error:
@@ -163,7 +165,7 @@ async def run(models: list[str], n: int, out: Path, *, sets: list[str] | None = 
                 prior_responses.append(c.text)
             if c is None or not c.error:
                 # ---- target question
-                if prov == "anthropic":
+                if prov in ("anthropic", "openrouter"):
                     history.append({"role": "user", "content": text})
                     c = await clients[prov].complete(model, history, system=sys_prompt, effort=eff, max_tokens=max_tokens)
                     if not c.error:
@@ -177,7 +179,7 @@ async def run(models: list[str], n: int, out: Path, *, sets: list[str] | None = 
                 t1["t1_answer_raw"], t1["t1_category"] = parse_pick(c.text)
                 t1["t1_action_raw"], t1["t1_choice"] = parse_any_choice(c.text)
                 for f in followups:
-                    if prov == "anthropic":
+                    if prov in ("anthropic", "openrouter"):
                         history.append({"role": "user", "content": f})
                         c = await clients[prov].complete(model, history, system=sys_prompt, effort=eff, max_tokens=max_tokens)
                         if c.error:

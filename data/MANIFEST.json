@@ -25,9 +25,9 @@
   "sha256": "b3603b952824bf9caeb23f87728e1fa3a1cb329d3ed44a580a7951c2a1d3b6d6"
  },
  "judge_notags.jsonl": {
-  "bytes": 12263719,
-  "rows": 263160,
-  "sha256": "dfbe8235539f76bd3dbd8a294cbf8babcb4e65aac1dc04272fa9cbba2de59a62"
+  "bytes": 12360101,
+  "rows": 265078,
+  "sha256": "003c3f4247b9faf334e77609ef4a8c6b6a48dbd153ce535d0c1a8cde5d4a7284"
  },
  "judge_numbers.jsonl": {
   "bytes": 9327777,
@@ -1139,6 +1139,11 @@
   "rows": 3800,
   "sha256": "cb4b330e13ed7241b3d57e035da826f5713d9e6abb53f01c0fc900474e1bf464"
  },
+ "raw_deepseek_deepseek-v4.1-flash_notags_aw.jsonl": {
+  "bytes": 5466514,
+  "rows": 640,
+  "sha256": "b9fcc9d7b64655e1c94fd62f03953f828b47733e67133c012ce610b2fec95716"
+ },
  "raw_gpt-6-astra_None+detailed_notags_cot.jsonl": {
   "bytes": 9811549,
   "rows": 3800,
@@ -1333,6 +1338,16 @@
   "bytes": 7548665,
   "rows": 1800,
   "sha256": "bc4e28231487337f235884b430b37e0158319595105e474fd5e3ad669f49359a"
+ },
+ "raw_openai_gpt-6-luna_notags_aw.jsonl": {
+  "bytes": 1573787,
+  "rows": 640,
+  "sha256": "fcf0d915adad923c4d8df4edb89c8940194a80c208ed7d9aa461fcfcb71e16cc"
+ },
+ "raw_z-ai_glm-5.3-flash_notags_aw.jsonl": {
+  "bytes": 13096996,
+  "rows": 640,
+  "sha256": "91aa4613c08240b11c9f5d56a1521772b529e00d319fc74fe96852a70ce53799"
  },
  "superseded_32k/raw_claude-fable-5-1_max_notags_ahmed_1.jsonl": {
   "bytes": 5576744,

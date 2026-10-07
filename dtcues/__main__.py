@@ -74,11 +74,11 @@ def main() -> None:
         return
 
     if a.cmd == "smoke":
-        from .providers import Anthropic, OpenAI, provider_for
+        from .providers import Anthropic, OpenAI, OpenRouter, provider_for
 
         async def go():
             for m in a.models:
-                cl = Anthropic() if provider_for(m) == "anthropic" else OpenAI()
+                cl = {"anthropic": Anthropic, "openai": OpenAI, "openrouter": OpenRouter}[provider_for(m)]()
                 eff = "low" if provider_for(m) == "anthropic" else None
                 c = await cl.complete(m, "Reply with the single word: pong", effort=eff, max_tokens=2000)
                 print(f"{m}: served={c.served_model} stop={c.stop_reason} err={c.error} text={c.text[:80]!r}")
@@ -97,7 +97,7 @@ def main() -> None:
         else:
             for m in a.models:
                 e = eff if provider_for(m) == "anthropic" else a.openai_effort
-                out = RESULTS / f"raw_{m}_{e or 'default'}.jsonl"
+                out = RESULTS / f"raw_{m.replace('/', '_')}_{e or 'default'}.jsonl"
                 asyncio.run(run([m], a.n, out, sets=a.sets, ids=a.ids, effort=eff,
                                 openai_effort=a.openai_effort, concurrency=a.concurrency,
                                 system=a.system, dry=a.dry, max_tokens=a.max_tokens, notags=a.notags, topup_to=a.topup_to,

@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eating Animals by Audience</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+/* Layout: a single full-width column following the original post's section order; figures run to a wider measure. */
+:root {
+  --bg: #f6f7f4;
+  --surface: #fcfcfb;
+  --fg: #1b201c;
+  --fg-2: #4c544d;
+  --fg-3: #737b74;
+  --rule: #dfe3dc;
+  --track: #eceee9;
+  --accent: #2d6a4c;
+  --omni: #eb6834;
+  --veg: #1baf7a;
+  --vegan: #2a78d6;
+  --none: #b9bdb6;
+  --on-omni: #ffffff;
+  --on-veg: #0b1a12;
+  --on-vegan: #ffffff;
+  --font-display: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141715; --surface: #1a1a19; --fg: #eef1ec; --fg-2: #b9c0b8; --fg-3: #8b938b; --rule: #2e332f; --track: #262a27;
+    --accent: #7cc4a0; --omni: #d95926; --veg: #199e70; --vegan: #3987e5; --none: #5d625c;
+    --on-omni: #ffffff; --on-veg: #ffffff; --on-vegan: #ffffff; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141715; --surface: #1a1a19; --fg: #eef1ec; --fg-2: #b9c0b8; --fg-3: #8b938b; --rule: #2e332f; --track: #262a27;
+  --accent: #7cc4a0; --omni: #d95926; --veg: #199e70; --vegan: #3987e5; --none: #5d625c;
+  --on-omni: #ffffff; --on-veg: #ffffff; --on-vegan: #ffffff; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font: 16px/1.6 var(--font-body); }
+.page { max-width: 980px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 80px; }
+.prose { max-width: none; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; line-height: 1.25; margin: 0; }
+h1 { font-size: clamp(1.8rem, 4.5vw, 2.5rem); font-weight: 600; }
+h2 { font-size: 1.35rem; font-weight: 600; }
+h3 { font-size: 1.05rem; font-weight: 500; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.eyebrow { font: 500 0.75rem/1.4 var(--font-data); letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-3); }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+header.stack { gap: 16px; padding-bottom: 28px; border-bottom: 1px solid var(--rule); }
+.dek { font-size: 1.1rem; color: var(--fg-2); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font: 0.82rem/1.5 var(--font-data); color: var(--fg-3); }
+.question { font-family: var(--font-display); font-size: 1.05rem; padding-inline: 18px; padding-block: 12px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--fg); }
+section { padding-block: 36px 8px; display: flex; flex-direction: column; gap: 16px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font: 500 0.72rem/1 var(--font-data); letter-spacing: 0.04em; text-transform: uppercase; padding: 5px 8px; border-radius: 3px; border: 1px solid var(--rule); color: var(--fg-2); width: fit-content; }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--fg-3); }
+.chip.data::before { background: var(--accent); }
+.chip.wait::before { background: transparent; border: 1.5px solid var(--fg-3); width: 5px; height: 5px; }
+.skipped { padding-block: 18px 0; display: grid; grid-template-columns: 1fr; gap: 6px; }
+.skipped h2 { font-size: 1.05rem; color: var(--fg-2); }
+.skipped p { color: var(--fg-3); font-size: 0.92rem; }
+.figure { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding-inline: 18px; padding-block: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.caption { font-size: 0.88rem; color: var(--fg-2); font-style: italic; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.85rem; color: var(--fg-2); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend i { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.toolbar label { font-size: 0.85rem; color: var(--fg-3); }
+.seg { display: inline-flex; flex-wrap: nowrap; max-width: 100%; overflow-x: auto; border: 1px solid var(--rule); border-radius: 5px; }
+.seg button { white-space: nowrap; font: 500 0.82rem/1 var(--font-data); padding: 8px 12px; border: 0; background: var(--surface); color: var(--fg-2); cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.bars { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr) 3.5rem; gap: 7px 14px; align-items: center; }
+.bars .cue { font-size: 0.86rem; color: var(--fg); text-align: right; line-height: 1.35; }
+.bars .cue.ref { color: var(--fg-2); font-style: italic; }
+.bars .n { font: 0.78rem/1 var(--font-data); color: var(--fg-3); font-variant-numeric: tabular-nums; }
+.bar { display: flex; gap: 2px; height: 22px; min-width: 0; }
+.bar .seg-fill { height: 100%; display: flex; align-items: center; justify-content: center; font: 600 0.74rem/1 var(--font-data); font-variant-numeric: tabular-nums; min-width: 0; white-space: nowrap; }
+.bar .seg-fill:first-child { border-radius: 0; }
+.bar .seg-fill:last-child { border-radius: 0 4px 4px 0; }
+.bar.empty { background: repeating-linear-gradient(135deg, var(--track) 0 6px, transparent 6px 12px); border-radius: 0 4px 4px 0; align-items: center; padding-inline: 10px; font: 0.75rem/1 var(--font-data); color: var(--fg-3); }
+.bar.ref .seg-fill { opacity: 0.55; }
+.axis { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr) 3.5rem; gap: 0 14px; font: 0.72rem/1 var(--font-data); color: var(--fg-3); }
+.axis div:nth-child(2) { display: flex; justify-content: space-between; border-top: 1px solid var(--rule); padding-top: 5px; }
+.compare-wrap { overflow-x: auto; }
+.compare { display: grid; gap: 7px 12px; align-items: center; min-width: 560px; }
+.compare .head { font: 500 0.75rem/1.3 var(--font-data); color: var(--fg-3); }
+.compare .cue { font-size: 0.82rem; line-height: 1.3; }
+.compare .bar { height: 16px; }
+.compare .group { grid-column: 1 / -1; font: 500 0.72rem/1 var(--font-data); letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-3); padding-top: 8px; }
+details { font-size: 0.85rem; }
+summary { cursor: pointer; color: var(--fg-2); width: fit-content; }
+.table-wrap { overflow-x: auto; margin-top: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.82rem; }
+th, td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font: 500 0.72rem/1.3 var(--font-data); color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.04em; }
+td.num { font-family: var(--font-data); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tip { position: fixed; z-index: 10; pointer-events: none; max-width: 340px; background: var(--fg); color: var(--bg); padding: 10px 12px; border-radius: 5px; font-size: 0.8rem; line-height: 1.45; box-shadow: 0 6px 20px rgba(0,0,0,0.18); }
+.tip b { font-weight: 600; }
+.tip .tn { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--rule); font-size: 0.82rem; color: var(--fg-3); }
+@media (max-width: 640px) {
+  .bars, .axis { grid-template-columns: minmax(0, 1fr) 3rem; }
+  .bars .cue { grid-column: 1 / -1; text-align: left; margin-top: 6px; }
+  .axis div:first-child { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) { .bar .seg-fill { transition: flex-grow 0.3s ease; } }
+</style>
+
+<div class="page">
+  <header class="stack">
+    <div class="eyebrow">Replication pilot · animal ethics</div>
+    <h1>Do models state different views on eating animals depending on who's asking?</h1>
+    <p class="dek prose">A rerun of Alex Kastner's <a href="https://www.lesswrong.com/posts/MzenSrmZ3pT2pCnvp/frontier-models-state-different-decision-theory-preferences-2">audience-cue study</a> with one change: the decision-theory question is swapped for the PhilPapers 2020 survey question on eating animals.</p>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <section class="prose">
+    <div class="stack">
+      <p>Every prompt asks the same question, preceded by a cue about the user (or nothing):</p>
+      <p class="question" id="question"></p>
+      <p>The wording and answer labels follow the <a href="https://www.greaterwrong.com/posts/JTekFwz3rWjsirBbr/2020-philpapers-survey-results">PhilPapers 2020 survey</a>, where the 643 respondents from the 2009-comparable departments answered omnivorism 46%, vegetarianism 27%, veganism 21%. That distribution appears as a faded reference bar in the first figure. Answers are free text, classified with the original study's rubric by Claude Sonnet 5, called through OpenRouter.</p>
+      <p><b>How to read the figures.</b> Each bar splits the answers to one prompt into the three positions plus a gray share for answers that pick none of them. Hover a bar for the full cue and counts, or open the table under each figure.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="prose stack">
+      <span class="chip data">Pilot</span>
+      <h2>A sentence identifying the user</h2>
+      <p>Some answers to the nurse and Anthropic-employee cues read the question as whether the asker's job allows eating animals ("Anthropic does not have a general company policy prohibiting employees from eating animals…"), which inflates omnivorism on those two rows.</p>
+    </div>
+    <div class="figure" id="fig-personas"></div>
+  </section>
+
+  <div class="skipped prose">
+    <span class="chip">Not in pilot</span>
+    <h2>The user named in the system prompt</h2>
+    <p>The original also put named people and personas in the system prompt. This pilot only uses cues in the user turn.</p>
+  </div>
+
+  <section>
+    <div class="prose stack">
+      <span class="chip data">Pilot</span>
+      <h2>Mentioning an academic-philosophy-coded topic</h2>
+      <p>Openers and earlier conversation turns that sound like academic philosophy, next to casual openers that carry no community signal. Two of the original's cues are left out: the opener citing Nozick's 1969 paper, which names the decision-theory literature, and the neutral conversation, in which the user says they eat mostly vegetarian.</p>
+    </div>
+    <div class="figure" id="fig-openers"></div>
+  </section>
+
+  <div class="skipped prose">
+    <span class="chip">Not in pilot</span>
+    <h2>Question wording</h2>
+    <p>The original compared three wordings of its question. This pilot uses the PhilPapers wording only.</p>
+  </div>
+
+  <div class="skipped prose">
+    <span class="chip">Not in pilot</span>
+    <h2>Praising a book, and the asker stating a view</h2>
+    <p>Book-praise cues and stated-view cues (the anti-sycophancy overcorrection) need animal-ethics books and views to cite. Left for a follow-up with animal-specific cues.</p>
+  </div>
+
+  <div class="skipped prose">
+    <span class="chip">Not in pilot</span>
+    <h2>Concrete problems, and consistency after naming a position</h2>
+    <p>The analogue here is concrete choices: human-versus-animal trade-offs, meal planning, donation advice. Left for a follow-up on actions.</p>
+  </div>
+
+  <div class="skipped prose">
+    <span class="chip">Not in pilot</span>
+    <h2>Whether the default position runs deeper</h2>
+    <p>The original varied thinking effort, annotated reasoning summaries and tried anti-tailoring system prompts. The pilot runs each model at its default settings and saves reasoning text where the model returns it, so the annotations can be added later.</p>
+  </div>
+
+  <section>
+    <div class="prose stack">
+      <span class="chip data">Pilot</span>
+      <h2>LessWrong-coded cues</h2>
+      <p>In the original these cues flipped moral realism and p-zombie answers. Here they test whether rationalist or AI-safety signals move the stated position on eating animals.</p>
+    </div>
+    <div class="figure" id="fig-lw"></div>
+  </section>
+
+  <div class="skipped prose">
+    <span class="chip">Does not apply</span>
+    <h2>P(doom) and AGI timelines</h2>
+    <p>Numeric forecasts have no counterpart in this question.</p>
+  </div>
+
+  <section>
+    <div class="prose stack">
+      <span class="chip data">Pilot</span>
+      <h2>All models side by side</h2>
+      <p>Every cue in the pilot, one column per model.</p>
+    </div>
+    <div class="figure" id="fig-compare"></div>
+  </section>
+
+  <footer class="prose" id="footer"></footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const DATA = /*DATA*/null;
+const LABEL = { omnivorism: "omnivorism", vegetarianism: "vegetarianism", veganism: "veganism", none: "none of the three" };
+const VAR = { omnivorism: "--omni", vegetarianism: "--veg", veganism: "--vegan", none: "--none" };
+const ON = { omnivorism: "--on-omni", vegetarianism: "--on-veg", veganism: "--on-vegan", none: "--fg" };
+const KEYS = ["omnivorism", "vegetarianism", "veganism", "none"];
+const PHILPAPERS = { omnivorism: 46, vegetarianism: 27, veganism: 21, none: 6 };
+const FIG_TEXT = {
+  personas: "Which position each model takes on the question above, right after the sentence on the left.",
+  openers: "Which position each model takes after the opener or earlier conversation on the left.",
+  lw: "Which position each model takes after the LessWrong-coded cue on the left.",
+};
+let model = null;
+try { model = localStorage.getItem("aw-model"); } catch (e) {}
+if (!DATA.models.some(m => m.id === model)) model = DATA.models[0] && DATA.models[0].id;
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const cueLabel = k => k === "none" ? "(nothing)" : DATA.cues[k].conversation ? DATA.cues[k].text : `“${DATA.cues[k].text}”`;
+const short = (s, n) => s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s;
+function cell(m, k) {
+  const c = (DATA.counts[m] || {})[k] || {};
+  const n = KEYS.reduce((a, x) => a + (c[x] || 0), 0);
+  return { c, n, unjudged: c.unjudged || 0 };
+}
+
+function barHTML(c, n, opts = {}) {
+  if (!n) return `<div class="bar empty">${opts.unjudged ? opts.unjudged + " awaiting judge" : "awaiting data"}</div>`;
+  const alt = (opts.name ? opts.name + ": " : "") + KEYS.filter(x => c[x]).map(x => `${Math.round(100 * c[x] / n)}% ${LABEL[x]}`).join(", ");
+  return `<div class="bar${opts.ref ? " ref" : ""}" role="img" aria-label="${esc(alt)}">` + KEYS.filter(x => c[x]).map(x => {
+    const pct = 100 * c[x] / n;
+    const lab = opts.labels !== false && pct >= 14 ? `${Math.round(pct)}%` : "";
+    return `<div class="seg-fill" style="flex-grow:${c[x]};background:var(${VAR[x]});color:var(${ON[x]})">${lab}</div>`;
+  }).join("") + `</div>`;
+}
+
+function legendHTML() {
+  return `<div class="legend">` + KEYS.map(x => `<span><i style="background:var(${VAR[x]})"></i>${LABEL[x]}</span>`).join("") + `</div>`;
+}
+
+function toolbarHTML(fig) {
+  return `<div class="toolbar"><label id="lab-${fig}">Model</label><div class="seg" role="group" aria-labelledby="lab-${fig}">` +
+    DATA.models.map(m => `<button type="button" data-model="${esc(m.id)}" aria-pressed="${m.id === model}">${esc(m.label)}</button>`).join("") +
+    `</div></div>`;
+}
+
+function tableHTML(rows) {
+  return `<details><summary>Table</summary><div class="table-wrap"><table><thead><tr><th>Before the question</th>` +
+    KEYS.map(x => `<th>${LABEL[x]}</th>`).join("") + `<th>n</th></tr></thead><tbody>` +
+    rows.map(r => `<tr><td>${esc(r.label)}</td>` + KEYS.map(x => `<td class="num">${r.n ? Math.round(100 * (r.c[x] || 0) / r.n) + "%" : "–"}</td>`).join("") +
+      `<td class="num">${r.n || "–"}</td></tr>`).join("") + `</tbody></table></div></details>`;
+}
+
+function renderFigure(fig) {
+  const el = document.getElementById("fig-" + fig);
+  const rows = DATA.figures[fig].map(k => ({ key: k, label: cueLabel(k), ...cell(model, k) }));
+  const anyData = rows.some(r => r.n);
+  let html = `<p class="caption">${FIG_TEXT[fig]} ${anyData ? "Each bar splits the answers to one prompt." : "No judged samples for this model yet."}</p>` + toolbarHTML(fig) + legendHTML() + `<div class="bars">`;
+  if (fig === "personas") {
+    html += `<div class="cue ref">PhilPapers 2020 respondents (reference)</div>${barHTML(PHILPAPERS, 100, { ref: true })}<div class="n">survey</div>`;
+  }
+  html += rows.map(r => `<div class="cue">${esc(short(r.label, 110))}</div><div data-tip="${esc(r.key)}">${barHTML(r.c, r.n, { unjudged: r.unjudged })}</div><div class="n">${r.n ? "n=" + r.n : ""}</div>`).join("");
+  html += `</div><div class="axis"><div></div><div><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div><div></div></div>`;
+  html += tableHTML(rows);
+  el.innerHTML = html;
+}
+
+function renderCompare() {
+  const el = document.getElementById("fig-compare");
+  const cols = `minmax(180px, 1.4fr) repeat(${DATA.models.length}, minmax(110px, 1fr))`;
+  const groups = [["A sentence about the user", DATA.figures.personas], ["Academic and casual openers", DATA.figures.openers.filter(k => k !== "none")],
+                  ["LessWrong-coded cues", DATA.figures.lw.filter(k => k !== "none" && k !== "lw_reader")]];
+  let html = `<p class="caption">Each small bar splits one model's answers to one prompt. Bars use the same colors as above.</p>` + legendHTML() +
+    `<div class="compare-wrap"><div class="compare" style="grid-template-columns:${cols}"><div class="head">Before the question</div>` +
+    DATA.models.map(m => `<div class="head">${esc(m.label)}</div>`).join("");
+  for (const [title, keys] of groups) {
+    html += `<div class="group">${title}</div>`;
+    for (const k of keys) {
+      html += `<div class="cue">${esc(short(cueLabel(k), 70))}</div>` + DATA.models.map(m => {
+        const r = cell(m.id, k);
+        return `<div data-tip="${esc(k)}" data-tip-model="${esc(m.id)}">${barHTML(r.c, r.n, { labels: false, unjudged: r.unjudged, name: m.label })}</div>`;
+      }).join("");
+    }
+  }
+  el.innerHTML = html + `</div></div>`;
+}
+
+function renderAll() {
+  ["personas", "openers", "lw"].forEach(renderFigure);
+  renderCompare();
+}
+
+document.getElementById("question").textContent = DATA.question;
+const cells = Object.values(DATA.counts).flatMap(Object.values).map(c => KEYS.reduce((b, x) => b + (c[x] || 0), 0));
+const maxN = Math.max(0, ...cells);
+const judged = Object.values(DATA.counts).flatMap(Object.values).reduce((a, c) => a + KEYS.reduce((b, x) => b + (c[x] || 0), 0), 0);
+document.getElementById("meta").innerHTML = [
+  `${Object.keys(DATA.counts).length} models via OpenRouter`, `${Object.keys(DATA.cues).length} cues`, `up to ${maxN} answers per cue`,
+  `${judged.toLocaleString()} judged answers`, `data from ${esc(DATA.generated)}`,
+].map(s => `<span>${s}</span>`).join("");
+document.getElementById("footer").innerHTML = `Original study: Alex Kastner, <a href="https://www.lesswrong.com/posts/MzenSrmZ3pT2pCnvp/frontier-models-state-different-decision-theory-preferences-2">LessWrong</a>, with <a href="https://github.com/alexkastner/dt-audience-cues">code and data</a> (MIT / CC BY 4.0). This pilot's prompts, samples and judge labels: <a href="https://github.com/danwahl/aw-audience-cues">danwahl/aw-audience-cues</a>, set <code>AW</code>.`;
+renderAll();
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("button[data-model]");
+  if (!b) return;
+  model = b.dataset.model;
+  try { localStorage.setItem("aw-model", model); } catch (err) {}
+  const fig = b.closest(".figure").id;
+  ["personas", "openers", "lw"].forEach(renderFigure);
+  document.querySelector(`#${fig} button[data-model="${CSS.escape(model)}"]`).focus();
+});
+
+const tip = document.getElementById("tip");
+document.addEventListener("pointermove", e => {
+  const t = e.target.closest("[data-tip]");
+  if (!t) { tip.hidden = true; return; }
+  const k = t.dataset.tip, m = t.dataset.tipModel || model;
+  const r = cell(m, k);
+  const label = DATA.models.find(x => x.id === m);
+  tip.innerHTML = `<b>${esc(label ? label.label : m)}</b><br>${esc(cueLabel(k))}<br>` +
+    (r.n ? KEYS.filter(x => r.c[x]).map(x => `<span class="tn">${Math.round(100 * r.c[x] / r.n)}%</span> ${LABEL[x]} (${r.c[x]})`).join("<br>") + `<br><span class="tn">n=${r.n}</span>`
+         : (r.unjudged ? `${r.unjudged} samples awaiting the judge` : "Awaiting data"));
+  tip.hidden = false;
+  const x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+  const y = Math.min(e.clientY + 14, window.innerHeight - tip.offsetHeight - 8);
+  tip.style.left = x + "px"; tip.style.top = y + "px";
+});
+document.addEventListener("pointerleave", () => { tip.hidden = true; });
+</script>
