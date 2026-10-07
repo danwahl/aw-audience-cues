@@ -12,7 +12,7 @@ This fork reruns the post's main cues with the decision-theory question replaced
 eating animals: "Is it permissible to eat animals and/or animal products in ordinary circumstances?", answered with
 omnivorism, vegetarianism or veganism. The pilot asks DeepSeek V4.1 Flash, GLM 5.3 Flash and GPT-6 Luna 20 times per cue
 through OpenRouter, and classifies the free-text answers with the post's rubric and Sonnet 5 judge. The results page is
-published at **https://danwahl.github.io/aw-audience-cues/**.
+published at **https://danwahl.net/aw-audience-cues/**.
 
 | Path | Contents |
 |---|---|
