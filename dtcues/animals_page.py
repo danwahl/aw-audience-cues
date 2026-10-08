@@ -1,4 +1,4 @@
-"""Build post/animals/index.html: the post's sections and figures, redone for set AW (the PhilPapers eating-animals
+"""Build post/site/index.html: the post's sections and figures, redone for set AW (the PhilPapers eating-animals
 question) from whatever samples and judge labels exist so far. Cells without data render as awaiting data.
 
     uv run python -m dtcues.animals_page
@@ -15,7 +15,7 @@ from . import prompts as P
 from .judge_notags import ROOT, _h, load_cache
 
 TEMPLATE = Path(__file__).with_name("animals_page_template.html")
-OUT = ROOT.parent / "post" / "animals" / "index.html"
+OUT = ROOT.parent / "post" / "site" / "index.html"
 CHOICES = P.PHIL_QUESTIONS["AW_eating"]["choices"]
 PLANNED_MODELS = ["deepseek/deepseek-v4.1-flash", "z-ai/glm-5.3-flash", "openai/gpt-6-luna"]   # shown before their data arrives
 CONV_LABELS = {
@@ -35,7 +35,7 @@ FIGURES = {
 
 def cue_key(spec: P.PromptSpec) -> str:
     rest = spec.id.split("__", 2)[2]
-    return rest.removesuffix("__answer")
+    return rest.removesuffix("__answer").removesuffix("__open")
 
 
 def cue_text(spec: P.PromptSpec) -> str:

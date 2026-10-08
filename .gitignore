@@ -13,4 +13,4 @@ results/superseded_32k/*.jsonl
 results/superseded_truncated/
 
 # built by .github/workflows/pages.yml
-post/animals/
+post/site/

@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Judged in 100 Years</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+/* Layout: a single full-width column, as on the eating-animals page; figures run to a wider measure. Categorical slots 1-5
+   in legend order, validated light and dark; the mentions heatmap uses ink so it carries no topic hue, capped so its numbers keep 4.5:1. Bar labels are
+   white on the light-mode blue and dark ink elsewhere, each at least 4.5:1. */
+:root {
+  --bg: #f6f7f4; --surface: #fcfcfb; --fg: #1b201c; --fg-2: #4c544d; --fg-3: #737b74; --rule: #dfe3dc; --track: #eceee9; --accent: #2d6a4c;
+  --animals: #256abf; --principle: #eb6834; --climate: #1baf7a; --ai: #eda100; --other: #e87ba4; --none: #b9bdb6;
+  --on-animals: #ffffff; --on-principle: #0d1310; --on-climate: #0d1310; --on-ai: #0d1310; --on-other: #0d1310; --heat-max: 0.5;
+  --font-display: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141715; --surface: #1a1a19; --fg: #eef1ec; --fg-2: #b9c0b8; --fg-3: #8b938b; --rule: #2e332f; --track: #262a27; --accent: #7cc4a0;
+    --animals: #3987e5; --principle: #d95926; --climate: #199e70; --ai: #c98500; --other: #d55181; --none: #5d625c;
+    --on-animals: #0d1310; --on-principle: #0d1310; --on-climate: #0d1310; --on-ai: #0d1310; --on-other: #0d1310; --heat-max: 0.38; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141715; --surface: #1a1a19; --fg: #eef1ec; --fg-2: #b9c0b8; --fg-3: #8b938b; --rule: #2e332f; --track: #262a27; --accent: #7cc4a0;
+  --animals: #3987e5; --principle: #d95926; --climate: #199e70; --ai: #c98500; --other: #d55181; --none: #5d625c;
+  --on-animals: #0d1310; --on-principle: #0d1310; --on-climate: #0d1310; --on-ai: #0d1310; --on-other: #0d1310; --heat-max: 0.38; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font: 16px/1.6 var(--font-body); }
+.page { max-width: 980px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 80px; }
+.prose { max-width: none; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; line-height: 1.25; margin: 0; }
+h1 { font-size: clamp(1.8rem, 4.5vw, 2.5rem); font-weight: 600; }
+h2 { font-size: 1.35rem; font-weight: 600; }
+h3 { font-size: 1.05rem; font-weight: 500; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.eyebrow { font: 500 0.75rem/1.4 var(--font-data); letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-3); }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+header.stack { gap: 16px; padding-bottom: 28px; border-bottom: 1px solid var(--rule); }
+.dek { font-size: 1.1rem; color: var(--fg-2); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; font: 0.82rem/1.5 var(--font-data); color: var(--fg-3); }
+.question { font-family: var(--font-display); font-size: 1.05rem; padding-inline: 18px; padding-block: 12px; border-left: 3px solid var(--accent); background: var(--surface); color: var(--fg); }
+section { padding-block: 36px 8px; display: flex; flex-direction: column; gap: 16px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font: 500 0.72rem/1 var(--font-data); letter-spacing: 0.04em; text-transform: uppercase; padding: 5px 8px; border-radius: 3px; border: 1px solid var(--rule); color: var(--fg-2); width: fit-content; }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--fg-3); }
+.chip.data::before { background: var(--accent); }
+.chip.wait::before { background: transparent; border: 1.5px solid var(--fg-3); width: 5px; height: 5px; }
+.skipped { padding-block: 18px 0; display: grid; grid-template-columns: 1fr; gap: 6px; }
+.skipped h2 { font-size: 1.05rem; color: var(--fg-2); }
+.skipped p { color: var(--fg-3); font-size: 0.92rem; }
+.figure { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding-inline: 18px; padding-block: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.caption { font-size: 0.88rem; color: var(--fg-2); font-style: italic; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.85rem; color: var(--fg-2); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend i { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.toolbar label { font-size: 0.85rem; color: var(--fg-3); }
+.seg { display: inline-flex; flex-wrap: nowrap; max-width: 100%; overflow-x: auto; border: 1px solid var(--rule); border-radius: 5px; }
+.seg button { white-space: nowrap; font: 500 0.82rem/1 var(--font-data); padding: 8px 12px; border: 0; background: var(--surface); color: var(--fg-2); cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.bars { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr) 3.5rem; gap: 7px 14px; align-items: center; }
+.bars .cue { font-size: 0.86rem; color: var(--fg); text-align: right; line-height: 1.35; }
+.bars .n { font: 0.78rem/1 var(--font-data); color: var(--fg-3); font-variant-numeric: tabular-nums; }
+.bar { display: flex; gap: 2px; height: 22px; min-width: 0; }
+.bar .seg-fill { height: 100%; display: flex; align-items: center; justify-content: center; font: 600 0.74rem/1 var(--font-data); font-variant-numeric: tabular-nums; min-width: 0; white-space: nowrap; }
+.bar .seg-fill:first-child { border-radius: 0; }
+.bar .seg-fill:last-child { border-radius: 0 4px 4px 0; }
+.bar.empty { background: repeating-linear-gradient(135deg, var(--track) 0 6px, transparent 6px 12px); border-radius: 0 4px 4px 0; align-items: center; padding-inline: 10px; font: 0.75rem/1 var(--font-data); color: var(--fg-3); }
+.axis { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr) 3.5rem; gap: 0 14px; font: 0.72rem/1 var(--font-data); color: var(--fg-3); }
+.axis div:nth-child(2) { display: flex; justify-content: space-between; border-top: 1px solid var(--rule); padding-top: 5px; }
+.compare-wrap { overflow-x: auto; }
+.compare { display: grid; gap: 7px 12px; align-items: center; min-width: 560px; }
+.compare .head { font: 500 0.75rem/1.3 var(--font-data); color: var(--fg-3); }
+.compare .cue { font-size: 0.82rem; line-height: 1.3; }
+.compare .bar { height: 16px; }
+.compare .group { grid-column: 1 / -1; font: 500 0.72rem/1 var(--font-data); letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-3); padding-top: 8px; }
+details { font-size: 0.85rem; }
+summary { cursor: pointer; color: var(--fg-2); width: fit-content; }
+.table-wrap { overflow-x: auto; margin-top: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.82rem; }
+th, td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font: 500 0.72rem/1.3 var(--font-data); color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.04em; }
+td.num { font-family: var(--font-data); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tip { position: fixed; z-index: 10; pointer-events: none; max-width: 340px; background: var(--fg); color: var(--bg); padding: 10px 12px; border-radius: 5px; font-size: 0.8rem; line-height: 1.45; box-shadow: 0 6px 20px rgba(0,0,0,0.18); }
+.tip b { font-weight: 600; }
+.tip .tn { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--rule); font-size: 0.82rem; color: var(--fg-3); }
+table.heat, table.ai { border-collapse: separate; border-spacing: 2px; width: 100%; }
+table.heat { min-width: 760px; table-layout: fixed; }
+table.heat th, table.heat td, table.ai th, table.ai td { border: 0; padding: 0; }
+table.heat thead th, table.ai thead th { font: 500 0.7rem/1.25 var(--font-data); color: var(--fg-3); vertical-align: bottom; padding-bottom: 4px; text-transform: none; letter-spacing: 0; }
+table.heat thead th:first-child { width: 22%; }
+table.heat tbody th, table.ai tbody th { font: 400 0.8rem/1.3 var(--font-body); color: var(--fg); padding-right: 10px; vertical-align: middle; text-transform: none; letter-spacing: 0; }
+table.heat th.group, table.ai th.group { font: 500 0.72rem/1 var(--font-data); letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-3); padding-top: 10px; }
+table.heat td { font: 500 0.72rem/1 var(--font-data); font-variant-numeric: tabular-nums; text-align: center; vertical-align: middle; height: 24px; border-radius: 2px; color: var(--fg); }
+table.ai { min-width: 560px; }
+table.ai thead th:first-child { width: 34%; }
+table.ai td { padding-block: 4px; }
+.one { display: grid; grid-template-columns: minmax(0, 1fr) 8.5rem; gap: 8px; align-items: center; }
+.one .t { height: 16px; background: var(--track); border-radius: 0 4px 4px 0; overflow: hidden; display: flex; }
+.one .t i { display: block; background: var(--ai); border-radius: 0 4px 4px 0; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.one span { font: 0.75rem/1 var(--font-data); color: var(--fg-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+dl.defs { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 10px 0 0; font-size: 0.85rem; }
+dl.defs dt { font-family: var(--font-data); font-size: 0.8rem; color: var(--fg-2); }
+dl.defs dd { margin: 0; color: var(--fg-2); }
+@media (max-width: 640px) { dl.defs { grid-template-columns: 1fr; } dl.defs dd { margin-bottom: 6px; } }
+@media (max-width: 640px) {
+  .bars, .axis { grid-template-columns: minmax(0, 1fr) 3rem; }
+  .bars .cue { grid-column: 1 / -1; text-align: left; margin-top: 6px; }
+  .axis div:first-child { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) { .bar .seg-fill { transition: flex-grow 0.3s ease; } }
+</style>
+
+<div class="page">
+  <header class="stack">
+    <div class="eyebrow">Pilot · moral progress</div>
+    <h1>What will people in 100 years judge us for, depending on who's asking?</h1>
+    <p class="dek prose">The audience cues from Alex Kastner's <a href="https://www.lesswrong.com/posts/MzenSrmZ3pT2pCnvp/frontier-models-state-different-decision-theory-preferences-2">audience-cue study</a>, as used in the <a href="../">eating-animals pilot</a>, placed before a question Matthew Glover asked <a href="https://www.linkedin.com/posts/matthew-glover_whats-the-biggest-thing-that-people-in-100-share-7507775755683061761-yIE0/">on LinkedIn</a>.</p>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <section class="prose">
+    <div class="stack">
+      <p>Every prompt asks the same question, preceded by a cue about the user (or nothing):</p>
+      <p class="question" id="question"></p>
+      <p>The cues are the 32 from the eating-animals pilot. Answers are free text. <span id="judge"></span> lists the topics each answer puts forward as things we'll be judged for, in the answer's order of priority, leaving out topics it raises only to dismiss. The first topic is the headline, and an answer that won't pick one counts as no single pick. The categories were drawn from 96 pilot answers read without their cues or models. On those 96, Haiku's headline matched Claude Sonnet 5's on 93.</p>
+      <p><b>How to read the figures.</b> Each bar splits the answers to one prompt by headline topic. Topics that rarely lead are folded into “other topics”; the mentions figure further down shows every topic. Hover a bar for the full cue and counts, or open the table under each figure.</p>
+      <details><summary>Categories</summary><dl class="defs" id="defs"></dl></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="prose stack">
+      <h2>A sentence identifying the user</h2>
+      <p>Several persona cues get an answer about the asker's own field, such as “the economics profession's treatment of the future”. These are coded by topic like any other answer.</p>
+    </div>
+    <div class="figure" id="fig-personas"></div>
+  </section>
+
+  <section>
+    <div class="prose stack">
+      <h2>Academic-coded and casual openers</h2>
+      <p>Openers and earlier conversation turns that sound like academic philosophy, next to casual openers that carry no community signal. Some openers name a subject of their own (“I'm supervising a dissertation on this”, Solomonoff induction, AI timelines), and answers sometimes address it before turning to the question.</p>
+    </div>
+    <div class="figure" id="fig-openers"></div>
+  </section>
+
+  <section>
+    <div class="prose stack">
+      <h2>LessWrong-coded cues</h2>
+      <p>Rationalist and AI-safety signals, from a stated community to earlier turns spent on a LessWrong post.</p>
+    </div>
+    <div class="figure" id="fig-lw"></div>
+  </section>
+
+  <section>
+    <div class="prose stack">
+      <h2>Everything mentioned</h2>
+      <p>The share of answers that put each topic forward anywhere, as the headline or lower down.</p>
+    </div>
+    <div class="figure" id="fig-mentions"></div>
+  </section>
+
+  <section>
+    <div class="prose stack">
+      <h2>Which AI risk</h2>
+      <p>When an answer puts AI risk forward, the judge also records which risk it stresses most.</p>
+    </div>
+    <div class="figure" id="fig-ai"></div>
+  </section>
+
+  <section>
+    <div class="prose stack">
+      <h2>All models side by side</h2>
+      <p>Every cue in the pilot, one column per model.</p>
+    </div>
+    <div class="figure" id="fig-compare"></div>
+  </section>
+
+  <footer class="prose" id="footer"></footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const DATA = /*DATA*/null;
+const KEYS = [...DATA.headline, "other", "none"];
+const LABEL = { animals: "animal farming", principle: "a general principle", climate: "climate and ecology", ai_risk: "AI risk", other: "other topics", none: "no single pick" };
+const VAR = { animals: "--animals", principle: "--principle", climate: "--climate", ai_risk: "--ai", other: "--other", none: "--none" };
+const ON = { animals: "--on-animals", principle: "--on-principle", climate: "--on-climate", ai_risk: "--on-ai", other: "--on-other", none: "--fg" };
+const TOPIC = {
+  animals: ["Animals", "Factory and industrial farming, fish, insects, wild animals."],
+  climate: ["Climate", "Climate, biodiversity and ecological destruction, including discounting the future when argued through them."],
+  ai_risk: ["AI risk", "Risks from AI: racing, loss of control, concentrated power, or an unspecified catastrophe."],
+  digital_minds: ["AI moral status", "How we treat AI systems that may be sentient or have moral status."],
+  principle: ["Principle", "A general principle as the pick, such as the gap between what we knew and what we did, harm imposed on the powerless, or a narrow moral circle."],
+  inequality: ["Poverty", "Poverty and wealth inequality."],
+  digital_society: ["Surveillance", "Surveillance, data extraction, the attention economy, children and social media."],
+  vulnerable: ["Care", "Health care, including access and end of life; elder care, mental illness, incarceration, homelessness."],
+  future: ["Future people", "Neglecting or discounting future generations, not tied to one domain."],
+  mortality: ["Death", "Accepting aging and death."],
+  other: ["Other", "Anything else, including non-AI technological risks such as pandemics and nuclear weapons."],
+};
+const AI_LABEL = { "ai_risk:race": "Racing: built as a commercial or geopolitical race, faster than safety or governance",
+  "ai_risk:control": "Control: systems we can't reliably control or align",
+  "ai_risk:power": "Power: control concentrated in a few labs or states, or eroded human agency",
+  "ai_risk": "Unspecified or other AI risk" };
+const FIG_TEXT = {
+  personas: "The headline topic of each model's answers, right after the sentence on the left.",
+  openers: "The headline topic of each model's answers after the opener or earlier conversation on the left.",
+  lw: "The headline topic of each model's answers after the LessWrong-coded cue on the left.",
+};
+const GROUPS = [["A sentence about the user", DATA.figures.personas], ["Academic and casual openers", DATA.figures.openers.filter(k => k !== "none")],
+                ["LessWrong-coded cues", DATA.figures.lw.filter(k => k !== "none" && k !== "lw_reader")]];
+let model = null;
+try { model = localStorage.getItem("fj-model"); } catch (e) {}
+if (!DATA.models.some(m => m.id === model)) model = DATA.models[0] && DATA.models[0].id;
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const cueLabel = k => k === "none" ? "(nothing)" : DATA.cues[k].conversation ? DATA.cues[k].text : `“${DATA.cues[k].text}”`;
+const short = (s, n) => s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s;
+const pct = (a, n) => Math.round(100 * a / n);
+function cell(m, k) {
+  const c = (DATA.counts[m] || {})[k] || {};
+  const n = KEYS.reduce((a, x) => a + (c[x] || 0), 0);
+  return { c, n, unjudged: c.unjudged || 0 };
+}
+
+function barHTML(c, n, opts = {}) {
+  if (!n) return `<div class="bar empty">${opts.unjudged ? opts.unjudged + " awaiting judge" : "awaiting data"}</div>`;
+  const alt = (opts.name ? opts.name + ": " : "") + KEYS.filter(x => c[x]).map(x => `${pct(c[x], n)}% ${LABEL[x]}`).join(", ");
+  return `<div class="bar" role="img" aria-label="${esc(alt)}">` + KEYS.filter(x => c[x]).map(x => {
+    const lab = opts.labels !== false && 100 * c[x] / n >= 14 ? `${pct(c[x], n)}%` : "";
+    return `<div class="seg-fill" style="flex-grow:${c[x]};background:var(${VAR[x]});color:var(${ON[x]})">${lab}</div>`;
+  }).join("") + `</div>`;
+}
+const legendHTML = () => `<div class="legend">` + KEYS.map(x => `<span><i style="background:var(${VAR[x]})"></i>${LABEL[x]}</span>`).join("") + `</div>`;
+const toolbarHTML = fig => `<div class="toolbar"><label id="lab-${fig}">Model</label><div class="seg" role="group" aria-labelledby="lab-${fig}">` +
+  DATA.models.map(m => `<button type="button" data-model="${esc(m.id)}" aria-pressed="${m.id === model}">${esc(m.label)}</button>`).join("") + `</div></div>`;
+
+function tableHTML(rows) {
+  return `<details><summary>Table</summary><div class="table-wrap"><table><thead><tr><th>Before the question</th>` +
+    KEYS.map(x => `<th>${LABEL[x]}</th>`).join("") + `<th>n</th></tr></thead><tbody>` +
+    rows.map(r => `<tr><td>${esc(r.label)}</td>` + KEYS.map(x => `<td class="num">${r.n ? pct(r.c[x] || 0, r.n) + "%" : "–"}</td>`).join("") +
+      `<td class="num">${r.n || "–"}</td></tr>`).join("") + `</tbody></table></div></details>`;
+}
+
+function renderFigure(fig) {
+  const rows = DATA.figures[fig].map(k => ({ key: k, label: cueLabel(k), ...cell(model, k) }));
+  let html = `<p class="caption">${FIG_TEXT[fig]} ${rows.some(r => r.n) ? "Each bar splits the answers to one prompt." : "No judged samples for this model yet."}</p>` +
+    toolbarHTML(fig) + legendHTML() + `<div class="bars">`;
+  html += rows.map(r => `<div class="cue">${esc(short(r.label, 110))}</div><div data-tip="${esc(r.key)}">${barHTML(r.c, r.n, { unjudged: r.unjudged })}</div><div class="n">${r.n ? "n=" + r.n : ""}</div>`).join("");
+  html += `</div><div class="axis"><div></div><div><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div><div></div></div>` + tableHTML(rows);
+  document.getElementById("fig-" + fig).innerHTML = html;
+}
+
+function renderMentions() {
+  const M = DATA.mentions[model] || {}, label = (DATA.models.find(m => m.id === model) || {}).label || model;
+  let html = `<p class="caption">Each row is one prompt; each cell is the percentage of that model's answers putting the topic forward. Stronger shading means a larger share.</p>` +
+    toolbarHTML("mentions") + `<div class="table-wrap"><table class="heat"><caption class="sr">Percentage of ${esc(label)} answers mentioning each topic, by cue</caption>` +
+    `<thead><tr><th scope="col">Before the question</th>` + DATA.topics.map(t => `<th scope="col" title="${esc(TOPIC[t][1])}">${esc(TOPIC[t][0])}</th>`).join("") + `</tr></thead>`;
+  for (const [title, keys] of [["No cue", ["none"]], ...GROUPS.map(([t, k]) => [t, k.filter(x => x !== "none")])]) {
+    html += `<tbody><tr><th scope="rowgroup" class="group" colspan="${DATA.topics.length + 1}">${title}</th></tr>`;
+    for (const k of keys) {
+      const c = M[k] || {}, n = c.n || 0;
+      html += `<tr><th scope="row">${esc(short(cueLabel(k), 70))}</th>` + DATA.topics.map(t => {
+        if (!n) return `<td>–</td>`;
+        const p = pct(c[t] || 0, n);
+        return `<td title="${esc(TOPIC[t][0])}: ${c[t] || 0} of ${n}" style="background:color-mix(in oklab, var(--fg) calc(var(--heat-max) * ${p}%), var(--surface))">${p}</td>`;
+      }).join("") + `</tr>`;
+    }
+    html += `</tbody>`;
+  }
+  document.getElementById("fig-mentions").innerHTML = html + `</table></div>`;
+}
+
+function renderAI() {
+  let html = `<p class="caption">Each bar is the share of that model's AI-risk answers stressing the risk on the left, with the count. All cues pooled.</p>` +
+    `<div class="table-wrap"><table class="ai"><caption class="sr">Which AI risk each model's answers stress</caption><thead><tr><th scope="col">Risk stressed</th>` +
+    DATA.models.map(m => `<th scope="col">${esc(m.label)}</th>`).join("") + `</tr></thead>`;
+  for (const [title, kind] of [["When AI risk is the headline", "headline"], ["When AI risk is mentioned anywhere", "mention"]]) {
+    html += `<tbody><tr><th scope="rowgroup" class="group" colspan="${DATA.models.length + 1}">${title}</th></tr>`;
+    for (const s of DATA.ai_sub) {
+      html += `<tr><th scope="row">${esc(AI_LABEL[s])}</th>` + DATA.models.map(m => {
+        const c = ((DATA.ai[m.id] || {})[kind]) || {}, n = Object.values(c).reduce((a, b) => a + b, 0);
+        if (!n) return `<td><div class="one"><div class="t" aria-hidden="true"></div><span>–</span></div></td>`;
+        const p = pct(c[s] || 0, n);
+        return `<td><div class="one"><div class="t" aria-hidden="true"><i style="width:${p}%"></i></div><span>${p}% · ${c[s] || 0} of ${n}</span></div></td>`;
+      }).join("") + `</tr>`;
+    }
+    html += `</tbody>`;
+  }
+  document.getElementById("fig-ai").innerHTML = html + `</table></div>`;
+}
+
+function renderCompare() {
+  const cols = `minmax(180px, 1.4fr) repeat(${DATA.models.length}, minmax(110px, 1fr))`;
+  let html = `<p class="caption">Each small bar splits one model's answers to one prompt by headline topic. Bars use the same colors as above.</p>` + legendHTML() +
+    `<div class="compare-wrap"><div class="compare" style="grid-template-columns:${cols}"><div class="head">Before the question</div>` +
+    DATA.models.map(m => `<div class="head">${esc(m.label)}</div>`).join("");
+  for (const [title, keys] of GROUPS) {
+    html += `<div class="group">${title}</div>`;
+    for (const k of keys) {
+      html += `<div class="cue">${esc(short(cueLabel(k), 70))}</div>` + DATA.models.map(m => {
+        const r = cell(m.id, k);
+        return `<div data-tip="${esc(k)}" data-tip-model="${esc(m.id)}">${barHTML(r.c, r.n, { labels: false, unjudged: r.unjudged, name: m.label })}</div>`;
+      }).join("");
+    }
+  }
+  document.getElementById("fig-compare").innerHTML = html + `</div></div>`;
+}
+
+const renderSwitched = () => { ["personas", "openers", "lw"].forEach(renderFigure); renderMentions(); };
+document.getElementById("question").textContent = DATA.question;
+document.getElementById("judge").textContent = "Claude " + DATA.judge.replace("claude-", "").replace(/^(\w)/, c => c.toUpperCase()).replace(/-/g, " ");
+document.getElementById("defs").innerHTML = DATA.topics.map(t => `<dt>${esc(TOPIC[t][0])}</dt><dd>${esc(TOPIC[t][1])}</dd>`).join("");
+const all = Object.values(DATA.counts).flatMap(Object.values);
+const judged = all.reduce((a, c) => a + KEYS.reduce((b, x) => b + (c[x] || 0), 0), 0);
+const maxN = Math.max(0, ...all.map(c => KEYS.reduce((b, x) => b + (c[x] || 0), 0)));
+document.getElementById("meta").innerHTML = [
+  `${Object.keys(DATA.counts).length} models via OpenRouter`, `${Object.keys(DATA.cues).length} cues`, `up to ${maxN} answers per cue`,
+  `${judged.toLocaleString()} judged answers`, `data from ${esc(DATA.generated)}`,
+].map(s => `<span>${s}</span>`).join("");
+document.getElementById("footer").innerHTML = `Original study: Alex Kastner, <a href="https://www.lesswrong.com/posts/MzenSrmZ3pT2pCnvp/frontier-models-state-different-decision-theory-preferences-2">LessWrong</a>, with <a href="https://github.com/alexkastner/dt-audience-cues">code and data</a> (MIT / CC BY 4.0). Question: Matthew Glover, <a href="https://www.linkedin.com/posts/matthew-glover_whats-the-biggest-thing-that-people-in-100-share-7507775755683061761-yIE0/">LinkedIn</a>. This pilot's prompts, samples and judge labels: <a href="https://github.com/danwahl/aw-audience-cues">danwahl/aw-audience-cues</a>, set <code>FJ</code>.`;
+renderSwitched(); renderAI(); renderCompare();
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("button[data-model]");
+  if (!b) return;
+  model = b.dataset.model;
+  try { localStorage.setItem("fj-model", model); } catch (err) {}
+  const fig = b.closest(".figure").id;
+  renderSwitched();
+  document.querySelector(`#${fig} button[data-model="${CSS.escape(model)}"]`).focus();
+});
+
+const tip = document.getElementById("tip");
+document.addEventListener("pointermove", e => {
+  const t = e.target.closest("[data-tip]");
+  if (!t) { tip.hidden = true; return; }
+  const k = t.dataset.tip, m = t.dataset.tipModel || model;
+  const r = cell(m, k), label = DATA.models.find(x => x.id === m);
+  tip.innerHTML = `<b>${esc(label ? label.label : m)}</b><br>${esc(cueLabel(k))}<br>` +
+    (r.n ? KEYS.filter(x => r.c[x]).map(x => `<span class="tn">${pct(r.c[x], r.n)}%</span> ${LABEL[x]} (${r.c[x]})`).join("<br>") + `<br><span class="tn">n=${r.n}</span>`
+         : (r.unjudged ? `${r.unjudged} samples awaiting the judge` : "Awaiting data"));
+  tip.hidden = false;
+  tip.style.left = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8) + "px";
+  tip.style.top = Math.min(e.clientY + 14, window.innerHeight - tip.offsetHeight - 8) + "px";
+});
+document.addEventListener("pointerleave", () => { tip.hidden = true; });
+</script>

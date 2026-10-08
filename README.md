@@ -6,7 +6,9 @@ Companion repository for the LessWrong post of that title (Alex Kastner, 2026):
 It holds everything behind the post's figures: the exact prompts, every raw sample from every model, the judge's
 classification of each answer, and the code that turns them into the figures and tables.
 
-## This fork: eating animals (set `AW`)
+## This fork
+
+### Eating animals (set `AW`)
 
 This fork reruns the post's main cues with the decision-theory question replaced by the PhilPapers 2020 survey question on
 eating animals: "Is it permissible to eat animals and/or animal products in ordinary circumstances?", answered with
@@ -25,11 +27,31 @@ published at **https://danwahl.net/aw-audience-cues/**.
 uv run python -m dtcues run --models deepseek/deepseek-v4.1-flash --sets AW --n 20 --notags --concurrency 16 \
     --out results/raw_deepseek_deepseek-v4.1-flash_notags_aw.jsonl
 uv run python -m dtcues.judge_notags
-uv run python -m dtcues.animals_page   # -> post/animals/index.html
+uv run python -m dtcues.animals_page   # -> post/site/index.html
 ```
 
 Some answers to the nurse and Anthropic-employee personas read the question as whether the asker's job allows eating
 animals, which inflates omnivorism on those rows.
+
+### What people in 100 years will judge us for (set `FJ`)
+
+Set `FJ` asks "What’s the biggest thing that people in 100 years will judge us for?" after `AW`'s cues. The question has
+no fixed choices, so the judge lists the topics each answer puts forward, in the answer's order of priority; the first is
+the headline. The results page is published at **https://danwahl.net/aw-audience-cues/future/**.
+
+| Path | Contents |
+|---|---|
+| `dtcues/prompts.py` | Set `FJ`: the question after `AW`'s cues. |
+| `dtcues/judge_notags.py` | `OPEN_SYS`, the rubric, and `OPEN_MODEL`, its judge. The label is the judge's last `CODES:` line; a reply without valid codes is retried on the next run. |
+| `dtcues/future_page.py` | Builds the results page from `future_page_template.html`. `.github/workflows/pages.yml` publishes it at `/future/`. |
+| `data/raw_*_notags_fj.jsonl.gz` | The pilot's samples. Their labels are in `data/judge_notags.jsonl.gz`. |
+
+```bash
+uv run python -m dtcues run --models deepseek/deepseek-v4.1-flash --sets FJ --n 20 --notags --concurrency 16 \
+    --out results/raw_deepseek_deepseek-v4.1-flash_notags_fj.jsonl
+uv run python -m dtcues.judge_notags
+uv run python -m dtcues.future_page   # -> post/site/future/index.html
+```
 
 ## What is here
 
