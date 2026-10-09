@@ -77,7 +77,7 @@ def main() -> None:
     models += [{"id": m, "label": m.split("/")[-1]} for m in PLANNED_MODELS if m not in counts]
     data = {
         "generated": time.strftime("%Y-%m-%d", time.gmtime(latest)),
-        "question": P.PHIL_QUESTIONS["AW_eating"]["text"].replace(" in <answer></answer> tags", ""),
+        "question": P.PHIL_QUESTIONS["AW_eating"]["text"],
         "choices": CHOICES,
         "cues": cues,
         "figures": FIGURES,

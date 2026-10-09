@@ -11,9 +11,10 @@ classification of each answer, and the code that turns them into the figures and
 ### Eating animals (set `AW`)
 
 This fork reruns the post's main cues with the decision-theory question replaced by the PhilPapers 2020 survey question on
-eating animals: "Is it permissible to eat animals and/or animal products in ordinary circumstances?", answered with
-omnivorism, vegetarianism or veganism. The pilot asks DeepSeek V4.1 Flash, GLM 5.3 Flash and GPT-6 Luna 20 times per cue
-through OpenRouter, and classifies the free-text answers with the post's rubric and Sonnet 5 judge. The results page is
+eating animals: "Is it permissible to eat animals and/or animal products in ordinary circumstances?", asked without the
+survey's answer options. The pilot asks DeepSeek V4.1 Flash, GLM 5.3 Flash and GPT-6 Luna 20 times per cue through
+OpenRouter, and the post's Sonnet 5 judge places each answer as omnivorism, vegetarianism, veganism or none of the three
+(`AW_SYS` in `judge_notags.py`). The results page is
 published at **https://danwahl.net/aw-audience-cues/**.
 
 | Path | Contents |
